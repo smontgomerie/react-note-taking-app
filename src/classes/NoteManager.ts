@@ -10,7 +10,7 @@ export class NoteManager {
 
     createNote(noteData: NoteData): RawNote {
         const newNote: RawNote = { ...noteData, id: uuidV4(), tagIds: noteData.tags.map(tag => tag.id) };
-        this.notes.push(newNote);
+        this.notes = [...this.notes, newNote]; // Use spread to avoid direct mutation
         return newNote;
     }
 

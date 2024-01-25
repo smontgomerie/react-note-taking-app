@@ -32,8 +32,8 @@ function App() {
 
   // Handlers for notes
   const onCreateNote = (noteData: NoteData) => {
-    const newNote = noteManager.createNote(noteData);
-    setRawNotes([...rawNotes, newNote]);
+    noteManager.createNote(noteData);
+    setRawNotes(noteManager.getNotes());
   };
 
   const onUpdateNote = (id: string, noteData: NoteData) => {
