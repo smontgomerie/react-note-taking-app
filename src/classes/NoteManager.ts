@@ -1,5 +1,5 @@
-import { RawNote, NoteData } from '../App';
 import { v4 as uuidV4 } from 'uuid';
+import {NoteData, RawNote} from "./Note";
 
 export class NoteManager {
     private notes: RawNote[];

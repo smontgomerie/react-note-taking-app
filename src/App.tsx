@@ -79,6 +79,7 @@ function App() {
               availableTags={tagManager.getTags()}
               onUpdateTag={updateTag}
               onDeleteTag={deleteTag}
+              onAddTag={addTag}
             />
           }
         />
