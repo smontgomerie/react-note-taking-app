@@ -11,10 +11,10 @@ import {
 } from "react-bootstrap"
 import { Link } from "react-router-dom"
 import ReactSelect from "react-select"
-import { Tag } from "./App"
 import styles from "./NoteList.module.css"
+import {Tag} from "./classes/Tag";
 
-type SimplifiedNote = {
+export type SimplifiedNote = {
   tags: Tag[]
   title: string
   id: string

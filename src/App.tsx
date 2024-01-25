@@ -1,98 +1,72 @@
 import "bootstrap/dist/css/bootstrap.min.css"
-import { useMemo } from "react"
-import { Container } from "react-bootstrap"
-import { Routes, Route, Navigate } from "react-router-dom"
-import { NewNote } from "./NewNote"
-import { useLocalStorage } from "./useLocalStorage"
-import { v4 as uuidV4 } from "uuid"
-import { NoteList } from "./NoteList"
-import { NoteLayout } from "./NoteLayout"
-import { Note } from "./Note"
-import { EditNote } from "./EditNote"
+import {useEffect, useState} from "react"
+import {Container} from "react-bootstrap"
+import {Navigate, Route, Routes} from "react-router-dom"
+import {NewNote} from "./NewNote"
+import {useLocalStorage} from "./useLocalStorage"
+import {NoteList} from "./NoteList"
+import {NoteLayout} from "./NoteLayout"
+import {Note} from "./Note"
+import {EditNote} from "./EditNote"
+import {NoteManager} from "./classes/NoteManager";
+import {TagManager} from "./classes/TagManager";
+import {Tag} from "./classes/Tag";
+import {NoteData, RawNote} from "./classes/Note";
 
-export type Note = {
-  id: string
-} & NoteData
-
-export type RawNote = {
-  id: string
-} & RawNoteData
-
-export type RawNoteData = {
-  title: string
-  markdown: string
-  tagIds: string[]
-}
-
-export type NoteData = {
-  title: string
-  markdown: string
-  tags: Tag[]
-}
-
-export type Tag = {
-  id: string
-  label: string
-}
 
 function App() {
-  const [notes, setNotes] = useLocalStorage<RawNote[]>("NOTES", [])
-  const [tags, setTags] = useLocalStorage<Tag[]>("TAGS", [])
+  const [rawNotes, setRawNotes] = useLocalStorage<RawNote[]>("NOTES", []);
+  const [rawTags, setRawTags] = useLocalStorage<Tag[]>("TAGS", []);
 
-  const notesWithTags = useMemo(() => {
-    return notes.map(note => {
-      return { ...note, tags: tags.filter(tag => note.tagIds.includes(tag.id)) }
-    })
-  }, [notes, tags])
+  const [noteManager, setNoteManager] = useState(new NoteManager(rawNotes));
+  const [tagManager, setTagManager] = useState(new TagManager(rawTags));
 
-  function onCreateNote({ tags, ...data }: NoteData) {
-    setNotes(prevNotes => {
-      return [
-        ...prevNotes,
-        { ...data, id: uuidV4(), tagIds: tags.map(tag => tag.id) },
-      ]
-    })
-  }
+  // Update noteManager and tagManager when rawNotes or rawTags change
+  useEffect(() => {
+    setNoteManager(new NoteManager(rawNotes));
+  }, [rawNotes]);
 
-  function onUpdateNote(id: string, { tags, ...data }: NoteData) {
-    setNotes(prevNotes => {
-      return prevNotes.map(note => {
-        if (note.id === id) {
-          return { ...note, ...data, tagIds: tags.map(tag => tag.id) }
-        } else {
-          return note
-        }
-      })
-    })
-  }
+  useEffect(() => {
+    setTagManager(new TagManager(rawTags));
+  }, [rawTags]);
 
-  function onDeleteNote(id: string) {
-    setNotes(prevNotes => {
-      return prevNotes.filter(note => note.id !== id)
-    })
-  }
+  // Handlers for notes
+  const onCreateNote = (noteData: NoteData) => {
+    const newNote = noteManager.createNote(noteData);
+    setRawNotes([...rawNotes, newNote]);
+  };
 
-  function addTag(tag: Tag) {
-    setTags(prev => [...prev, tag])
-  }
+  const onUpdateNote = (id: string, noteData: NoteData) => {
+    noteManager.updateNote(id, noteData);
+    setRawNotes(noteManager.getNotes());
+  };
 
-  function updateTag(id: string, label: string) {
-    setTags(prevTags => {
-      return prevTags.map(tag => {
-        if (tag.id === id) {
-          return { ...tag, label }
-        } else {
-          return tag
-        }
-      })
-    })
-  }
+  const onDeleteNote = (id: string) => {
+    noteManager.deleteNote(id);
+    setRawNotes(noteManager.getNotes());
+  };
 
-  function deleteTag(id: string) {
-    setTags(prevTags => {
-      return prevTags.filter(tag => tag.id !== id)
-    })
-  }
+  // Handlers for tags
+  const addTag = (tag: Tag) => {
+    tagManager.addTag(tag);
+    setRawTags(tagManager.getTags());
+  };
+
+  const updateTag = (id: string, label: string) => {
+    tagManager.updateTag(id, label);
+    setRawTags(tagManager.getTags());
+  };
+
+  const deleteTag = (id: string) => {
+    tagManager.deleteTag(id);
+    setRawTags(tagManager.getTags());
+  };
+
+  const notesWithTags = noteManager.getNotes().map(note => {
+    return { ...note, tags: tagManager.getTags().filter(tag => note.tagIds.includes(tag.id)) };
+  });
+
+
 
   return (
     <Container className="my-4">
@@ -102,7 +76,7 @@ function App() {
           element={
             <NoteList
               notes={notesWithTags}
-              availableTags={tags}
+              availableTags={tagManager.getTags()}
               onUpdateTag={updateTag}
               onDeleteTag={deleteTag}
             />
@@ -114,7 +88,7 @@ function App() {
             <NewNote
               onSubmit={onCreateNote}
               onAddTag={addTag}
-              availableTags={tags}
+              availableTags={tagManager.getTags()}
             />
           }
         />
@@ -126,7 +100,7 @@ function App() {
               <EditNote
                 onSubmit={onUpdateNote}
                 onAddTag={addTag}
-                availableTags={tags}
+                availableTags={tagManager.getTags()}
               />
             }
           />

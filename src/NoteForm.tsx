@@ -2,8 +2,9 @@ import { FormEvent, useRef, useState } from "react"
 import { Button, Col, Form, Row, Stack } from "react-bootstrap"
 import { Link, useNavigate } from "react-router-dom"
 import CreatableReactSelect from "react-select/creatable"
-import { NoteData, Tag } from "./App"
 import { v4 as uuidV4 } from "uuid"
+import {Tag} from "./classes/Tag";
+import {NoteData} from "./classes/Note";
 
 type NoteFormProps = {
   onSubmit: (data: NoteData) => void
@@ -58,7 +59,7 @@ export function NoteForm({
                 value={selectedTags.map(tag => {
                   return { label: tag.label, value: tag.id }
                 })}
-                options={availableTags.map(tag => {
+                options={availableTags.map((tag: Tag) => {
                   return { label: tag.label, value: tag.id }
                 })}
                 onChange={tags => {
