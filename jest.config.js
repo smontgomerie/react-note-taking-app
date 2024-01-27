@@ -1,10 +1,13 @@
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
-    preset: 'ts-jest',
-    testEnvironment: 'node',
+    testEnvironment: 'jsdom',
     transform: {
-        '^.+\\.jsx?$': 'babel-jest',
+        '\\.[j]sx?$': 'babel-jest',
         '^.+\\.tsx?$': 'ts-jest',
     },
-    reporters: [ "jest-junit" ]
+    moduleNameMapper: {
+        'react-markdown': '<rootDir>/node_modules/react-markdown/react-markdown.min.js',
+        '\\.(css|less)$': '<rootDir>/src/__tests__/__mocks__/styleMock.js',
+    },
+    reporters: ["jest-junit"]
 };

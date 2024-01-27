@@ -24,4 +24,9 @@ export class TagManager {
     getTags(): Tag[] {
         return this.tags;
     }
+
+    setTags(rawTags: Tag[])
+    {
+        this.tags = rawTags;
+    }
 }
