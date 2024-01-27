@@ -27,4 +27,9 @@ export class NoteManager {
     getNotes(): RawNote[] {
         return this.notes;
     }
+
+    setNotes(notes: RawNote[])
+    {
+        this.notes = notes;
+    }
 }

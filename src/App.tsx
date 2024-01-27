@@ -1,5 +1,5 @@
 import "bootstrap/dist/css/bootstrap.min.css"
-import {useEffect, useState} from "react"
+import {useEffect, useRef, useState} from "react"
 import {Container} from "react-bootstrap"
 import {Navigate, Route, Routes} from "react-router-dom"
 import {NewNote} from "./NewNote"
@@ -18,17 +18,19 @@ function App() {
   const [rawNotes, setRawNotes] = useLocalStorage<RawNote[]>("NOTES", []);
   const [rawTags, setRawTags] = useLocalStorage<Tag[]>("TAGS", []);
 
-  const [noteManager, setNoteManager] = useState(new NoteManager(rawNotes));
-  const [tagManager, setTagManager] = useState(new TagManager(rawTags));
+  const noteManager = useRef(new NoteManager(rawNotes)).current;
+  const tagManager = useRef(new TagManager(rawTags)).current;
 
-  // Update noteManager and tagManager when rawNotes or rawTags change
   useEffect(() => {
-    setNoteManager(new NoteManager(rawNotes));
+    noteManager.setNotes(rawNotes);
+    // Optionally, trigger a state update if needed
   }, [rawNotes]);
 
   useEffect(() => {
-    setTagManager(new TagManager(rawTags));
+    tagManager.setTags(rawTags);
+    // Optionally, trigger a state update if needed
   }, [rawTags]);
+
 
   // Handlers for notes
   const onCreateNote = (noteData: NoteData) => {

@@ -1,5 +1,5 @@
 import { Navigate, Outlet, useOutletContext, useParams } from "react-router-dom"
-import { Note } from "./App"
+import {Note} from "./classes/Note";
 
 type NoteLayoutProps = {
   notes: Note[]
